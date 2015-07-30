@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ШРИ - Задание 3 - WebAudio API</title>
+    <script type="application/javascript" src="utils.js"></script>
+    <script type="application/javascript" src="player.js"></script>
+    <link rel="stylesheet" type="text/css" href="player.css">
+</head>
+<body>
+    <main class="player">
+        <input type="file" class="player__file-input">
+        <span class="player__title"></span>
+        <span class="player__track-title"></span>
+        <button class="player__play-button button round-button">
+            <img class="round-button__img" src="img/play48.svg">
+        </button>
+        <button class="player__pause-button button round-button">
+            <img class="round-button__img" src="img/pause36.svg">
+        </button>
+        <button class="player__stop-button button round-button">
+            <img class="round-button__img" src="img/stop23.svg">
+         </button>
+        <button class="player__open-button button round-button">
+            <img class="round-button__img" src="img/folder249.svg">
+        </button>
+        <canvas class="player__visualization"></canvas>
+        <div class="player__drop-area">drop file here</div>
+    </main>
+</body>
+</html>
