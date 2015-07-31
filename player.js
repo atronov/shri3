@@ -20,11 +20,11 @@ var Player = function(element) {
     this.elements.dropArea.addEventListener("drop", this._handleFileOpen.bind(this));
     this.elements.dropArea.addEventListener("dragover", this._showDropArea.bind(this));
     this.elements.dropArea.addEventListener("dragleave", this._hideDropArea.bind(this));
-    this.init();
+    this._init();
     this._disablePlay();
 };
 
-Player.prototype.init = function() {
+Player.prototype._init = function() {
     this.startedAt = 0;
     this.pausedAfter = 0;
     this.paused = false;
@@ -52,7 +52,13 @@ Player.prototype.play = function() {
     if (!this.playing && this.audioDataBuffer) {
         this.audioSource = this.audioCtx.createBufferSource();
         this.audioSource.buffer = this.audioDataBuffer;
-        this.audioSource.connect(this.audioCtx.destination);
+
+        var analizer = this.audioCtx.createAnalyser();
+        var visualization = new Spectrum(analizer, this.elements.visualization);
+
+        this.audioSource.connect(analizer);
+        analizer.connect(this.audioCtx.destination);
+
         if (this.paused) {
             this.startedAt = Date.now() - this.pausedAfter;
             this.audioSource.start(0, Math.round(this.pausedAfter / 1000));
@@ -63,6 +69,8 @@ Player.prototype.play = function() {
         this.playing = true;
         this.paused = false;
         this.pausedAfter = 0;
+
+        visualization.start();
     }
 };
 

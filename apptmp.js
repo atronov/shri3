@@ -3,10 +3,10 @@
  */
 var Player = function(element) {
     this.element = element;
-    this.init();
+    this._init();
 };
 
-Player.prototype.init = function() {
+Player.prototype._init = function() {
     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     this.initFileOpen();
 };
