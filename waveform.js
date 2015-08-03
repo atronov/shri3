@@ -1,9 +1,10 @@
 /**
  * Created by atronov on 31.07.15.
  */
-function WaveForm(analizerNode, canvas) {
-    this.node = analizerNode;
-    analizerNode.fftSize = 256;
+function WaveForm(analyzerNode, canvas) {
+    this.node = analyzerNode;
+    analyzerNode.fftSize = 256;
+    analyzerNode.smoothingTimeConstant = 0.3;
     this.canvas = canvas;
     this.canvasCtx = canvas.getContext("2d");
 }

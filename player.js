@@ -10,7 +10,8 @@ var Player = function(element) {
         dropArea: element.querySelector(".player__drop-area"),
         title: element.querySelector(".player__title"),
         open: element.querySelector(".player__open-button"),
-        visualization: element.querySelector(".player__visualization")
+        visualization: element.querySelector(".player__visualization"),
+        equalizer: element.querySelector(".player__equalizer")
     };
     this.elements.play.addEventListener("click", this.play.bind(this));
     this.elements.stop.addEventListener("click", this.stop.bind(this));
@@ -30,6 +31,7 @@ Player.prototype._init = function() {
     this.paused = false;
     this.playing = false;
     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    this.equalizer = new Equalizer(this.audioCtx, this.elements.equalizer);
 };
 
 Player.prototype.open = function(file) {
@@ -52,11 +54,15 @@ Player.prototype.play = function() {
     if (!this.playing && this.audioDataBuffer) {
         this.audioSource = this.audioCtx.createBufferSource();
         this.audioSource.buffer = this.audioDataBuffer;
+        this.audioSource.loop = true;
 
         var analizer = this.audioCtx.createAnalyser();
+        var analizer2 = this.audioCtx.createAnalyser();
         var visualization = new Spectrum(analizer, this.elements.visualization);
+        var visualization2 = new Spectrum(analizer2, document.querySelector(".player__visualization2"));
 
-        this.audioSource.connect(analizer);
+        this.audioSource.connect(analizer2);
+        this.equalizer.connect(analizer2, analizer);
         analizer.connect(this.audioCtx.destination);
 
         if (this.paused) {
@@ -71,6 +77,7 @@ Player.prototype.play = function() {
         this.pausedAfter = 0;
 
         visualization.start();
+        visualization2.start();
     }
 };
 

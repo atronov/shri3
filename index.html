@@ -6,6 +6,7 @@
     <script type="application/javascript" src="utils.js"></script>
     <script type="application/javascript" src="waveform.js"></script>
     <script type="application/javascript" src="spectrum.js"></script>
+    <script type="application/javascript" src="equalizer.js"></script>
     <script type="application/javascript" src="player.js"></script>
     <link rel="stylesheet" type="text/css" href="player.css">
 </head>
@@ -26,8 +27,22 @@
         <button class="player__open-button button round-button">
             <img class="round-button__img" src="img/folder249.svg">
         </button>
-        <canvas class="player__visualization" width="600" height="400"></canvas>
+        <canvas class="player__visualization" width="600" height="250"></canvas>
+        <canvas class="player__visualization2" width="600" height="250"></canvas>
+        <div class="player__equalizer">
+            <input type="range" class="vertical-range line1" max="30" value="0" min="-30">
+            <input type="range" class="vertical-range line2" max="30" value="0" min="-30">
+            <input type="range" class="vertical-range line3" max="30" value="0" min="-30">
+            <input type="range" class="vertical-range line4" max="30" value="0" min="-30">
+            <input type="range" class="vertical-range line5" max="30" value="0" min="-30">
+            <input type="range" class="vertical-range line6" max="30" value="0" min="-30">
+            <input type="range" class="vertical-range line7" max="30" value="0" min="-30">
+            <input type="range" class="vertical-range line8" max="30" value="0" min="-30">
+            <input type="range" class="vertical-range line9" max="30" value="0" min="-30">
+            <input type="range" class="vertical-range line10" max="30" value="0" min="-30">
+        </div>
         <div class="player__drop-area">drop file here</div>
     </main>
+
 </body>
 </html>
