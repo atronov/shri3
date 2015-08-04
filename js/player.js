@@ -11,7 +11,7 @@ var Player = function(element) {
         title: element.querySelector(".player__title"),
         open: element.querySelector(".player__open-button"),
         visualization: element.querySelector(".player__visualization"),
-        equalizer: element.querySelector(".player__equalizer")
+        equalizer: element.querySelector(".player__equalizer"),
     };
     this.elements.play.addEventListener("click", this.play.bind(this));
     this.elements.stop.addEventListener("click", this.stop.bind(this));
@@ -21,6 +21,7 @@ var Player = function(element) {
     this.elements.dropArea.addEventListener("drop", this._handleFileOpen.bind(this));
     this.elements.dropArea.addEventListener("dragover", this._showDropArea.bind(this));
     this.elements.dropArea.addEventListener("dragleave", this._hideDropArea.bind(this));
+
     this._init();
     this._disablePlay();
 };
@@ -62,7 +63,9 @@ Player.prototype.play = function() {
         var visualization2 = new Spectrum(analizer2, document.querySelector(".player__visualization2"));
 
         this.audioSource.connect(analizer2);
+
         this.equalizer.connect(analizer2, analizer);
+
         analizer.connect(this.audioCtx.destination);
 
         if (this.paused) {
