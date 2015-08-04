@@ -3,9 +3,32 @@
  */
 Equalizer = function(audioCtx, equalizerElement) {
     this.audioCtx = audioCtx;
+    this.element = equalizerElement;
     this.enabled = false;
     this.connected = false;
+    this._initFilters();
+    this._initSwitch();
+    this._initPresets();
+};
+
+/**
+ * Подключаем эквалайзер
+ * Сделано в не в конструкторе, чтобы можно было менять источник/приемник в одном экхемпляре
+ */
+Equalizer.prototype.connect = function(srcNode, dstNode) {
+    this.srcNode = srcNode;
+    this.dstNode = dstNode;
+    this.connected = true;
+    this._updateState();
+};
+
+/**
+ * Создаём фильтры и связываем их с эелеиентами на UI
+ * @private
+ */
+Equalizer.prototype._initFilters = function() {
     this.filters = [];
+    var maxGain = 12;
     // частоты взяты из winamp
     // 60, 170, 310, 600, 1000, 3000, 6000, 12000, 14000, 16000
     // значения Q-фактора получены эксперементально
@@ -17,14 +40,14 @@ Equalizer = function(audioCtx, equalizerElement) {
     this.filters[4] = this._createFilter("peaking", 1000, 1);
     this.filters[5] = this._createFilter("peaking", 3000, 1);
     this.filters[6] = this._createFilter("peaking", 6000, 1);
-    this.filters[7] = this._createFilter("peaking", 12000, 1.5); // получено эксперементально
-    this.filters[8] = this._createFilter("peaking", 14000, 1.6); // получено эксперементально
+    this.filters[7] = this._createFilter("peaking", 12000, 1.5);
+    this.filters[8] = this._createFilter("peaking", 14000, 1.6);
     // как и с нижней границей, но нужен был highshelf
-    this.filters[9] = this._createFilter("peaking", 16000, 1.7); // получено эксперементально
+    this.filters[9] = this._createFilter("peaking", 16000, 1.7);
 
-    var maxGain = 12;
+    this.filterInputs = [];
     for (var i = 0; i < this.filters.length; i++) {
-        var filterElement = equalizerElement.querySelector(".line"+(i+1));
+        var filterElement = this.filterInputs[i] = this.element.querySelector(".line"+(i+1));
         filterElement.value = 0;
         filterElement.setAttribute("min", -maxGain);
         filterElement.setAttribute("max", maxGain);
@@ -32,14 +55,49 @@ Equalizer = function(audioCtx, equalizerElement) {
             filter.gain.value = parseFloat(e.target.value);
         }.bind(this, this.filters[i]));
     }
+};
 
-    var switchElement = equalizerElement.querySelector(".equalizer__switch");
+/**
+ * Вешаем события на включатель эквалайзера
+ * @private
+ */
+Equalizer.prototype._initSwitch = function() {
+    var switchElement = this.element.querySelector(".equalizer__switch");
     switchElement.checked = this.enabled;
     switchElement.addEventListener("change", function(e) {
         this.enabled = e.target.checked;
         this._updateState();
     }.bind(this));
     this._updateState();
+};
+
+/**
+ * Создаём предустановленные настройки и связываем их с select элементом на UI
+ * @private
+ */
+Equalizer.prototype._initPresets = function() {
+    this.presets = {
+        "default": [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+        "pop":     [-2, -1,  0,  2,  4,  4,  2,  0, -1, -2],
+        "rock":    [ 5,  4,  3,  1,  0, -1,  1,  3,  4,  5],
+        "metal":   [ 3,  6,  6,  7,  6,  4,  6,  0,  3,  7],
+        "jazz":    [ 4,  3,  1,  2, -2, -2,  0,  1,  2,  4]
+    };
+    var selectPreset = this.element.querySelector(".equalizer__preset");
+    var selected = false;
+    for (var presetKey in this.presets) {
+        var presetOption = document.createElement("option");
+        presetOption.textContent = presetKey;
+        presetOption.value = presetKey;
+        if (!selected) {
+            presetOption.setAttribute("selected", "selected");
+        }
+        selectPreset.appendChild(presetOption);
+    }
+    selectPreset.addEventListener("change", function() {
+        var presetName = selectPreset.options[selectPreset.selectedIndex].value;
+        this._setFilters(this.presets[presetName]);
+    }.bind(this));
 };
 
 Equalizer.prototype._createFilter = function(type, f, q) {
@@ -49,6 +107,55 @@ Equalizer.prototype._createFilter = function(type, f, q) {
     filter.gain.value = 0;
     if (typeof q !== "undefined") filter.Q.value = q;
     return filter;
+};
+
+Equalizer.prototype._setFilters = function(gains) {
+    for (var i = 0; i<gains.length; i++) {
+        this._setFilter(i, gains[i]);
+    }
+};
+
+Equalizer.prototype._setFilter = function(i, gain) {
+    this.filterInputs[i].value = gain;
+    this.filters[i].gain.value = gain;
+};
+
+/**
+ * Подключает/отключает фильтры соглавно флагам
+ * @private
+ */
+Equalizer.prototype._updateState = function() {
+    if (!this.connected) return;
+    if (this.enabled) {
+        this._enable();
+    } else {
+        this._disable();
+    }
+};
+
+/**
+ * Подключает фильтры между испочником и приёмником
+ * @private
+ */
+Equalizer.prototype._enable = function() {
+    this.srcNode.connect(this.filters[0]);
+    this.filters.reduce(function(cur, next) {
+        cur.connect(next);
+        return next;
+    });
+    this.filters[this.filters.length - 1].connect(this.dstNode);
+    this.enabled = true;
+};
+
+/**
+ * Подсоеднияем источник к приёмнику, игнорируя фильтры
+ * @private
+ */
+Equalizer.prototype._disable = function() {
+    this.srcNode.disconnect();
+    this.filters[this.filters.length - 1].disconnect();
+    this.srcNode.connect(this.dstNode);
+    this.enabled = false;
 };
 
 Equalizer.prototype.testFilter = function(i) {
@@ -73,37 +180,4 @@ Equalizer.prototype.testFilter = function(i) {
     };
     console.log("Magnitude:", printArray(calcMagnitude(freqAr, this.filters[i])));
     console.log("Edges:    ", printArray(calcMagnitude(rangeAr, this.filters[i])));
-};
-
-Equalizer.prototype.connect = function(srcNode, dstNode) {
-    this.srcNode = srcNode;
-    this.dstNode = dstNode;
-    this.connected = true;
-    this._updateState();
-};
-
-Equalizer.prototype._updateState = function() {
-    if (!this.connected) return;
-    if (this.enabled) {
-        this.enable();
-    } else {
-        this.disable();
-    }
-};
-
-Equalizer.prototype.enable = function() {
-    this.srcNode.connect(this.filters[0]);
-    this.filters.reduce(function(cur, next) {
-        cur.connect(next);
-        return next;
-    });
-    this.filters[this.filters.length - 1].connect(this.dstNode);
-    this.enabled = true;
-};
-
-Equalizer.prototype.disable = function() {
-    this.srcNode.disconnect();
-    this.filters[this.filters.length - 1].disconnect();
-    this.srcNode.connect(this.dstNode);
-    this.enabled = false;
 };

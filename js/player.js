@@ -128,7 +128,3 @@ Player.prototype._disablePlay = function() {
         el.disabled = true;
     });
 };
-
-window.addEventListener("load", function() {
-    player = new Player(document.querySelector(".player"));
-});
