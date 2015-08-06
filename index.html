@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>ШРИ - Задание 3 - WebAudio API</title>
     <script type="application/javascript" src="js/utils.js"></script>
+    <script type="application/javascript" src="js/visualization.js"></script>
     <script type="application/javascript" src="js/waveform.js"></script>
     <script type="application/javascript" src="js/spectrum.js"></script>
     <script type="application/javascript" src="js/equalizer.js"></script>
@@ -35,8 +36,8 @@
             Альбом: <span class="player__album-tag"></span><br/>
             Исполнитель: <span class="player__artist-tag"></span>
         </div>
+        <select class="player__visualization-select"></select>
         <canvas class="player__visualization" width="600" height="250"></canvas>
-        <canvas class="player__visualization2" width="600" height="250"></canvas>
         <div class="player__equalizer">
             <input type="range" class="vertical-range line1" orient="vertical">
             <input type="range" class="vertical-range line2" orient="vertical">

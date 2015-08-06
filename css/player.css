@@ -132,3 +132,8 @@
     /*-ms-transform:rotate(90deg);*/
     /*transform:rotate(90deg);*/
 }
+
+.player__visualization-select {
+    position: relative;
+    z-index: 2;
+}

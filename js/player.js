@@ -24,6 +24,7 @@ var Player = function(element) {
     this.elements.dropArea.addEventListener("dragleave", this._hideDropArea.bind(this));
 
     this._init();
+    this._initVisualization();
     this._disablePlay();
 };
 
@@ -60,17 +61,10 @@ Player.prototype.play = function() {
         this.audioSource = this.audioCtx.createBufferSource();
         this.audioSource.buffer = this.audioDataBuffer;
         this.audioSource.loop = true;
-
-        var analizer = this.audioCtx.createAnalyser();
-        var analizer2 = this.audioCtx.createAnalyser();
-        var visualization = new Spectrum(analizer, this.elements.visualization);
-        var visualization2 = new Spectrum(analizer2, document.querySelector(".player__visualization2"));
-
-        this.audioSource.connect(analizer2);
-
-        this.equalizer.connect(analizer2, analizer);
-
-        analizer.connect(this.audioCtx.destination);
+        this.analyzer = this.audioCtx.createAnalyser();
+        this.analyzer.connect(this.audioCtx.destination);
+        this.equalizer.connect(this.audioSource, this.analyzer);
+        this._connectVisualization();
 
         if (this.paused) {
             this.startedAt = Date.now() - this.pausedAfter;
@@ -82,9 +76,6 @@ Player.prototype.play = function() {
         this.playing = true;
         this.paused = false;
         this.pausedAfter = 0;
-
-        visualization.start();
-        visualization2.start();
     }
 };
 
@@ -100,6 +91,41 @@ Player.prototype.stop = function() {
     this.audioSource.stop();
     this.paused = false;
     this.playing = false;
+};
+
+Player.prototype._connectVisualization = function() {
+    if (this.visualization) {
+        this.visualization.stop();
+    }
+    var Visualization =  this.visualizationConstruntor;
+    this.visualization = new Visualization(this.analyzer, this.elements.visualization);
+};
+
+Player.prototype._initVisualization = function() {
+    var visualizations = {
+        "spectrum": Spectrum,
+        "waveform": WaveForm
+    };
+    var visualizationSelect = this.element.querySelector(".player__visualization-select");
+    var selected = false;
+    for (var visualizationName in visualizations) {
+        var visualization = visualizations[visualizationName];
+        var visualizationEl = document.createElement("option");
+        visualizationEl.textContent = visualizationName;
+        visualizationEl.value = visualizationName;
+        if (!selected) {
+            this.visualizationConstruntor = visualization;
+            visualizationEl.setAttribute("selected", "selected");
+        }
+        visualizationSelect.appendChild(visualizationEl);
+    }
+    visualizationSelect.addEventListener("change", function() {
+        var visualizationName = visualizationSelect.options[visualizationSelect.selectedIndex].value;
+        this.visualizationConstruntor = visualizations[visualizationName];
+        if (this.playing) {
+            this._connectVisualization();
+        }
+    }.bind(this));
 };
 
 Player.prototype._handleFileOpen = function(e) {
