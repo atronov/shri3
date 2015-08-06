@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>ШРИ - Задание 3 - WebAudio API</title>
-    <script type="application/javascript" src="js/id3-minimized.js"></script>
-    <script type="application/javascript" src="js/binaryfile.js"></script>
     <script type="application/javascript" src="js/utils.js"></script>
     <script type="application/javascript" src="js/waveform.js"></script>
     <script type="application/javascript" src="js/spectrum.js"></script>
     <script type="application/javascript" src="js/equalizer.js"></script>
     <script type="application/javascript" src="js/player.js"></script>
+    <script type="application/javascript" src="js/id3reader.js"></script>
+    <script type="application/javascript" src="js/test.js"></script>
     <script type="application/javascript" src="js/app.js"></script>
     <link rel="stylesheet" type="text/css" href="css/player.css">
 </head>
@@ -30,6 +30,11 @@
         <button class="player__open-button button round-button">
             <img class="round-button__img" src="img/folder249.svg">
         </button>
+        <div class="player__tags">
+            Трек: <span class="player__title-tag"></span><br/>
+            Альбом: <span class="player__album-tag"></span><br/>
+            Исполнитель: <span class="player__artist-tag"></span>
+        </div>
         <canvas class="player__visualization" width="600" height="250"></canvas>
         <canvas class="player__visualization2" width="600" height="250"></canvas>
         <div class="player__equalizer">

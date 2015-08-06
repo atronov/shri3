@@ -15,6 +15,16 @@ function test() {
     reader.readAsArrayBuffer(file);
 }
 
+function test2() {
+    var i = document.querySelector(".player__file-input");
+    var file = i.files[0];
+    var reader = new FileReader();
+    reader.addEventListener("load", function() {
+        getTags(reader.result);
+    });
+    reader.readAsArrayBuffer(file);
+}
+
 function _arrayBufferToString(buf, callback) {
   var bb = new Blob([new Uint8Array(buf)]);
   var f = new FileReader();

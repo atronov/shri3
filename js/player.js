@@ -2,6 +2,7 @@
  * Created by atronov on 25.07.15.
  */
 var Player = function(element) {
+    this.element = element;
     this.elements = {
         play: element.querySelector(".player__play-button"),
         stop: element.querySelector(".player__stop-button"),
@@ -38,8 +39,11 @@ Player.prototype._init = function() {
 Player.prototype.open = function(file) {
     var reader = new FileReader();
     reader.addEventListener("load", function() {
+        var fileData = reader.result;
         this.elements.title.textContent = file.name;
-        this.audioCtx.decodeAudioData(reader.result, function(buffer) {
+        var tags = getTags(fileData);
+        this._showTags(tags);
+        this.audioCtx.decodeAudioData(fileData, function(buffer) {
                 this.audioDataBuffer = buffer;
                 this._allowPlay();
             }.bind(this),
@@ -127,4 +131,19 @@ Player.prototype._disablePlay = function() {
     [this.elements.play, this.elements.pause, this.elements.stop].forEach(function(el) {
         el.disabled = true;
     });
+};
+
+Player.prototype._showTags = function(tags) {
+    if (tags.title) {
+        var titleEl = this.element.querySelector(".player__title-tag");
+        titleEl.textContent = tags.title
+    }
+    if (tags.album) {
+        var albumEl = this.element.querySelector(".player__album-tag");
+        albumEl.textContent = tags.album;
+    }
+    if (tags.artist) {
+        var artistEl = this.element.querySelector(".player__artist-tag");
+        artistEl.textContent = tags.artist;
+    }
 };
