@@ -9,26 +9,38 @@
  */
 function getTags(recordData) {
     var tags = {};
-    var id3Length = 128;
-    if (recordData && recordData.byteLength > id3Length) {
-        var id3Data =  new Uint8Array(recordData, recordData.byteLength - id3Length, id3Length);
+    var id3v1Length = 128;
+    var id3v1ExtLength = 227;
+    if (recordData && recordData.byteLength > id3v1Length) {
+        var id3v1Data =  new Uint8Array(recordData, recordData.byteLength - id3v1Length, id3v1Length);
         var offset = 0;
-        var tagTitle = arrayToString(id3Data.subarray(offset, offset+=3));
+        var tagTitle = arrayToString(id3v1Data.subarray(offset, offset+=3));
         if (tagTitle === "TAG") {
-            tags.title = arrayToString(id3Data.subarray(offset, offset+=30));
-            tags.artist = arrayToString(id3Data.subarray(offset, offset+=30));
-            tags.album = arrayToString(id3Data.subarray(offset, offset+=30));
-            tags.year = arrayToString(id3Data.subarray(offset, offset+=4));
-            var hasNumber = id3Data[offset+28] === 0;
+            tags.title = arrayToString(id3v1Data.subarray(offset, offset+=30));
+            tags.artist = arrayToString(id3v1Data.subarray(offset, offset+=30));
+            tags.album = arrayToString(id3v1Data.subarray(offset, offset+=30));
+            tags.year = arrayToString(id3v1Data.subarray(offset, offset+=4));
+            var hasNumber = id3v1Data[offset+28] === 0;
             if (hasNumber) {
-                tags.comment = arrayToString(id3Data.subarray(offset, offset+=28));
+                tags.comment = arrayToString(id3v1Data.subarray(offset, offset+=28));
                 offset++; // один байт - флаг наличия номера
-                tags.track = id3Data[offset++];
+                tags.track = id3v1Data[offset++];
             } else {
-                tags.comment = arrayToString(id3Data.subarray(offset, offset+=30));
+                tags.comment = arrayToString(id3v1Data.subarray(offset, offset+=30));
             }
-            var genreIndex = id3Data[offset++];
+            var genreIndex = id3v1Data[offset++];
             tags.genre = getGenreByInd(genreIndex);
+            if (recordData.byteLength > id3v1ExtLength + id3v1Length) {
+                var id3v1ExtData = new Uint8Array(recordData, recordData.byteLength - id3v1Length - id3v1ExtLength,
+                    id3v1ExtLength);
+                offset = 0;
+                var tagPlusTitle = arrayToString(id3v1ExtData.subarray(offset, offset+=4));
+                if (tagPlusTitle === "TAG+") {
+                    tags.title += arrayToString(id3v1ExtData.subarray(offset, offset+=60));
+                    tags.artist += arrayToString(id3v1ExtData.subarray(offset, offset+=60));
+                    tags.album += arrayToString(id3v1ExtData.subarray(offset, offset+=60));
+                }
+            }
         }
     }
     return tags;
