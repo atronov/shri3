@@ -1,0 +1,30 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sant-serif;
+    font-size: 12pt;
+    color: #2b2b2b;
+    text-indent: 0;
+}
+
+.invisible {
+    display: none !important;
+}
+
+.block {
+    display: block;
+}
+
+.indented {
+    margin: 3px;
+}
+
+.vertical-range {
+    width: 30px;
+    height: 150px;
+    writing-mode: bt-lr; /* IE */
+    -webkit-appearance: slider-vertical; /* WebKit */
+}

@@ -3,29 +3,13 @@
  */
 var Player = function(element) {
     this.element = element;
-    this.elements = {
-        play: element.querySelector(".player__play-button"),
-        stop: element.querySelector(".player__stop-button"),
-        pause: element.querySelector(".player__pause-button"),
-        file: element.querySelector(".player__file-input"),
-        dropArea: element.querySelector(".player__drop-area"),
-        title: element.querySelector(".player__title"),
-        open: element.querySelector(".player__open-button"),
-        visualization: element.querySelector(".player__visualization"),
-        equalizer: element.querySelector(".player__equalizer"),
-    };
-    this.elements.play.addEventListener("click", this.play.bind(this));
-    this.elements.stop.addEventListener("click", this.stop.bind(this));
-    this.elements.pause.addEventListener("click", this.pause.bind(this));
-    this.elements.open.addEventListener("click", this.elements.file.click.bind(this.elements.file));
-    this.elements.file.addEventListener("change", this._handleFileOpen.bind(this));
-    this.elements.dropArea.addEventListener("drop", this._handleFileOpen.bind(this));
-    this.elements.dropArea.addEventListener("dragover", this._showDropArea.bind(this));
-    this.elements.dropArea.addEventListener("dragleave", this._hideDropArea.bind(this));
-
     this._init();
+    this._initElements();
+    this._initEqualizer();
     this._initVisualization();
     this._disablePlay();
+    this._updatePlayOrPause();
+    this._showTags({}); // показать пустые теги, пока никакой трек не открыт
 };
 
 Player.prototype._init = function() {
@@ -34,17 +18,82 @@ Player.prototype._init = function() {
     this.paused = false;
     this.playing = false;
     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+};
+
+Player.prototype._initElements = function() {
+    var element = this.element;
+    this.elements = {
+        play: element.querySelector(".player__play-button"),
+        stop: element.querySelector(".player__stop-button"),
+        pause: element.querySelector(".player__pause-button"),
+        open: element.querySelector(".player__open-button"),
+        file: element.querySelector(".player__file-input"),
+        dropArea: element.querySelector(".player__drop-area"),
+        fileName: element.querySelector(".player__file-name"),
+        visualization: {
+            canvas: element.querySelector(".player__visualization-canvas"),
+            select: element.querySelector(".player__visualization-select")
+        },
+        tags: {
+            title: element.querySelector(".player__title-tag"),
+            album: element.querySelector(".player__album-tag"),
+            artist: element.querySelector(".player__artist-tag")
+        },
+        equalizer: element.querySelector(".player__equalizer")
+    };
+
+    this.elements.play.addEventListener("click", this.play.bind(this));
+    this.elements.stop.addEventListener("click", this.stop.bind(this));
+    this.elements.pause.addEventListener("click", this.pause.bind(this));
+    this.elements.open.addEventListener("click", this.elements.file.click.bind(this.elements.file));
+    this.elements.file.addEventListener("change", this._handleFileOpen.bind(this));
+    this.elements.dropArea.addEventListener("drop", this._handleFileOpen.bind(this));
+    this.element.addEventListener("dragover", this._showDropArea.bind(this));
+    this.elements.dropArea.addEventListener("dragleave", this._hideDropArea.bind(this));
+};
+
+Player.prototype._initEqualizer = function() {
     this.equalizer = new Equalizer(this.audioCtx, this.elements.equalizer);
+};
+
+Player.prototype._initVisualization = function() {
+    var visualizations = {
+        "spectrum": Spectrum,
+        "waveform": WaveForm
+    };
+    var visualizationSelect = this.elements.visualization.select;
+    var selected = false;
+    for (var visualizationName in visualizations) {
+        var visualization = visualizations[visualizationName];
+        var visualizationEl = document.createElement("option");
+        visualizationEl.textContent = visualizationName;
+        visualizationEl.value = visualizationName;
+        if (!selected) {
+            this.visualizationConstruntor = visualization;
+            visualizationEl.setAttribute("selected", "selected");
+        }
+        visualizationSelect.appendChild(visualizationEl);
+    }
+    visualizationSelect.addEventListener("change", function() {
+        var visualizationName = visualizationSelect.options[visualizationSelect.selectedIndex].value;
+        this.visualizationConstruntor = visualizations[visualizationName];
+        if (this.playing) {
+            this._connectVisualization();
+        }
+    }.bind(this));
 };
 
 Player.prototype.open = function(file) {
     var reader = new FileReader();
     reader.addEventListener("load", function() {
         var fileData = reader.result;
-        this.elements.title.textContent = file.name;
+        this.elements.fileName.textContent = file.name;
         var tags = getTags(fileData);
         this._showTags(tags);
         this.audioCtx.decodeAudioData(fileData, function(buffer) {
+                if (this.playing) {
+                    this.stop();
+                }
                 this.audioDataBuffer = buffer;
                 this._allowPlay();
             }.bind(this),
@@ -76,14 +125,20 @@ Player.prototype.play = function() {
         this.playing = true;
         this.paused = false;
         this.pausedAfter = 0;
+        this._updatePlayOrPause();
     }
 };
 
 Player.prototype.pause = function() {
     this.pausedAfter = Date.now() - this.startedAt;
+    if (this.audioDataBuffer) {
+        var duration = Math.round(this.audioDataBuffer.duration * 1000);
+        this.pausedAfter = this.pausedAfter % duration;
+    }
     this.audioSource.stop();
     this.paused = true;
     this.playing = false;
+    this._updatePlayOrPause();
 };
 
 Player.prototype.stop = function() {
@@ -91,6 +146,7 @@ Player.prototype.stop = function() {
     this.audioSource.stop();
     this.paused = false;
     this.playing = false;
+    this._updatePlayOrPause();
 };
 
 Player.prototype._connectVisualization = function() {
@@ -98,35 +154,9 @@ Player.prototype._connectVisualization = function() {
         this.visualization.stop();
     }
     var Visualization =  this.visualizationConstruntor;
-    this.visualization = new Visualization(this.analyzer, this.elements.visualization);
+    this.visualization = new Visualization(this.analyzer, this.elements.visualization.canvas);
 };
 
-Player.prototype._initVisualization = function() {
-    var visualizations = {
-        "spectrum": Spectrum,
-        "waveform": WaveForm
-    };
-    var visualizationSelect = this.element.querySelector(".player__visualization-select");
-    var selected = false;
-    for (var visualizationName in visualizations) {
-        var visualization = visualizations[visualizationName];
-        var visualizationEl = document.createElement("option");
-        visualizationEl.textContent = visualizationName;
-        visualizationEl.value = visualizationName;
-        if (!selected) {
-            this.visualizationConstruntor = visualization;
-            visualizationEl.setAttribute("selected", "selected");
-        }
-        visualizationSelect.appendChild(visualizationEl);
-    }
-    visualizationSelect.addEventListener("change", function() {
-        var visualizationName = visualizationSelect.options[visualizationSelect.selectedIndex].value;
-        this.visualizationConstruntor = visualizations[visualizationName];
-        if (this.playing) {
-            this._connectVisualization();
-        }
-    }.bind(this));
-};
 
 Player.prototype._handleFileOpen = function(e) {
     e.preventDefault();
@@ -139,12 +169,12 @@ Player.prototype._handleFileOpen = function(e) {
 
 Player.prototype._showDropArea = function(e) {
     e.preventDefault();
-    addClass("player__drop-area--hover", this.elements.dropArea);
+    removeClass("invisible", this.elements.dropArea);
 };
 
 Player.prototype._hideDropArea = function(e) {
     e.preventDefault();
-    removeClass("player__drop-area--hover", this.elements.dropArea);
+    addClass("invisible", this.elements.dropArea);
 };
 
 Player.prototype._allowPlay = function() {
@@ -160,16 +190,28 @@ Player.prototype._disablePlay = function() {
 };
 
 Player.prototype._showTags = function(tags) {
-    if (tags.title) {
-        var titleEl = this.element.querySelector(".player__title-tag");
-        titleEl.textContent = tags.title
-    }
-    if (tags.album) {
-        var albumEl = this.element.querySelector(".player__album-tag");
-        albumEl.textContent = tags.album;
-    }
-    if (tags.artist) {
-        var artistEl = this.element.querySelector(".player__artist-tag");
-        artistEl.textContent = tags.artist;
-    }
+    var showTag = function(el, text) {
+        if (text) {
+            el.querySelector(".tag-content").textContent = text;
+            removeClass("invisible", el);
+        } else {
+            addClass("invisible", el);
+        }
+    };
+    showTag(this.elements.tags.title, tags.title);
+    showTag(this.elements.tags.album, tags.album);
+    showTag(this.elements.tags.artist, tags.artist);
 };
+
+Player.prototype._updatePlayOrPause = function() {
+    if (this.playing) {
+        var toShow = this.elements.pause;
+        var toHide = this.elements.play;
+    } else {
+        var toHide = this.elements.pause;
+        var toShow = this.elements.play;
+    }
+    var invisibleClass = "invisible";
+    addClass(invisibleClass, toHide);
+    removeClass(invisibleClass, toShow);
+}

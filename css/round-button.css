@@ -1,0 +1,39 @@
+.round-button {
+    height: 60px;
+    width: 60px;
+    border-radius: 30px;
+    padding: 30px;
+    box-sizing: border-box;
+    border:1px solid #dcdcdc;
+    display:inline-block;
+    cursor:pointer;
+    font-size:15px;
+    position: relative;
+    background-color: #eaeaea;
+}
+
+.round-button:hover:not(:disabled) {
+    background-color:#f6f6f6;
+}
+
+    .round-button__img {
+        margin-left: -16px;
+        margin-top: -16px;
+        position: absolute;
+        height: 32px;
+        width: 32px;
+        display: inline-block;
+    }
+
+    .round-button:hover:not(:disabled) .round-button__img {
+        margin-left: -15px;
+        margin-top: -15px;
+        position: absolute;
+        height: 30px;
+        width: 30px;
+    }
+
+    .round-button:disabled .round-button__img {
+        opacity: 0.5;
+    }
+

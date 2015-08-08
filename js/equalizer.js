@@ -77,27 +77,39 @@ Equalizer.prototype._initSwitch = function() {
  */
 Equalizer.prototype._initPresets = function() {
     this.presets = {
+        "custom":  undefined, // при выборке этой строки просто ничего не меняемы
         "default": [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
         "pop":     [-2, -1,  0,  2,  4,  4,  2,  0, -1, -2],
         "rock":    [ 5,  4,  3,  1,  0, -1,  1,  3,  4,  5],
         "metal":   [ 3,  6,  6,  7,  6,  4,  6,  0,  3,  7],
         "jazz":    [ 4,  3,  1,  2, -2, -2,  0,  1,  2,  4]
     };
-    var selectPreset = this.element.querySelector(".equalizer__preset");
-    var selected = false;
+    var presetSelect = this.element.querySelector(".equalizer__preset");
+    var defaultSelected = "default"; // эта настройка будет выбрана поумолчанию
     for (var presetKey in this.presets) {
         var presetOption = document.createElement("option");
         presetOption.textContent = presetKey;
         presetOption.value = presetKey;
-        if (!selected) {
+        if (presetKey === defaultSelected) {
             presetOption.setAttribute("selected", "selected");
         }
-        selectPreset.appendChild(presetOption);
+        presetSelect.appendChild(presetOption);
     }
-    selectPreset.addEventListener("change", function() {
-        var presetName = selectPreset.options[selectPreset.selectedIndex].value;
+    presetSelect.addEventListener("change", function() {
+        var presetName = presetSelect.options[presetSelect.selectedIndex].value;
         this._setFilters(this.presets[presetName]);
     }.bind(this));
+    // если пользователь изменил один из фильтров, выставляем комбобокс в custom
+    var setCustomPreset = function() {
+        for (var ind in presetSelect.options) {
+            if (presetSelect.options[ind].value === "custom")
+                presetSelect.options[ind].setAttribute("selected", "selected");
+        }
+    };
+    this.filterInputs.forEach(function(filterInput) {
+        filterInput.addEventListener("change", setCustomPreset.bind(this));
+    }.bind(this));
+    this._setFilters(this.presets[defaultSelected]);
 };
 
 Equalizer.prototype._createFilter = function(type, f, q) {
@@ -110,8 +122,10 @@ Equalizer.prototype._createFilter = function(type, f, q) {
 };
 
 Equalizer.prototype._setFilters = function(gains) {
-    for (var i = 0; i<gains.length; i++) {
-        this._setFilter(i, gains[i]);
+    if (gains) {
+        for (var i = 0; i < gains.length; i++) {
+            this._setFilter(i, gains[i]);
+        }
     }
 };
 
@@ -142,6 +156,9 @@ Equalizer.prototype._enable = function() {
     this.filters.reduce(function(cur, next) {
         cur.connect(next);
         return next;
+    })
+    this.filterInputs.forEach(function(el) {
+        el.disabled = false;
     });
     this.filters[this.filters.length - 1].connect(this.dstNode);
     this.enabled = true;
@@ -155,6 +172,9 @@ Equalizer.prototype._disable = function() {
     this.srcNode.disconnect();
     this.filters[this.filters.length - 1].disconnect();
     this.srcNode.connect(this.dstNode);
+    this.filterInputs.forEach(function(el) {
+        el.disabled = true;
+    });
     this.enabled = false;
 };
 
@@ -176,7 +196,9 @@ Equalizer.prototype.testFilter = function(i) {
     };
 
     var printArray = function(ar) {
-        return ar.map(function(f) { return Math.round(f * 100); }).join(",");
+        return Array.prototype.map
+            .call(ar, function(f) { return Math.round(f * 100) / 100; })
+            .join(",");
     };
     console.log("Magnitude:", printArray(calcMagnitude(freqAr, this.filters[i])));
     console.log("Edges:    ", printArray(calcMagnitude(rangeAr, this.filters[i])));

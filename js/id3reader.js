@@ -36,7 +36,7 @@ function getTags(recordData) {
                 offset = 0;
                 var tagPlusTitle = arrayToString(id3v1ExtData.subarray(offset, offset+=4));
                 if (tagPlusTitle === "TAG+") {
-                    tags.title += arrayToString(id3v1ExtData.subarray(offset, offset+=60));
+                    tags.fileName += arrayToString(id3v1ExtData.subarray(offset, offset+=60));
                     tags.artist += arrayToString(id3v1ExtData.subarray(offset, offset+=60));
                     tags.album += arrayToString(id3v1ExtData.subarray(offset, offset+=60));
                 }
