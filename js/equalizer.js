@@ -182,29 +182,3 @@ Equalizer.prototype._disable = function() {
     });
     this.enabled = false;
 };
-
-Equalizer.prototype.testFilter = function(i) {
-    var toFrequency = function(ar) {
-        var far = new Float32Array(ar.length);
-        ar.forEach(function(el, ind) {
-            far[ind] = el;
-        });
-        return far;
-    };
-    var freqAr = toFrequency([60, 170, 310, 600, 1000, 3000, 6000, 12000, 14000, 16000]);
-    var rangeAr = toFrequency([30, 90, 180, 400, 750, 1800, 4000, 9000, 13000, 15000, 17000 ]);
-    var calcMagnitude = function(ar, filter) {
-        var magResponseOutput = new Float32Array(ar.length);
-        var phaseResponseOutput = new Float32Array(ar.length);
-        filter.getFrequencyResponse(ar,magResponseOutput,phaseResponseOutput);
-        return magResponseOutput;
-    };
-
-    var printArray = function(ar) {
-        return Array.prototype.map
-            .call(ar, function(f) { return Math.round(f * 100) / 100; })
-            .join(",");
-    };
-    console.log("Magnitude:", printArray(calcMagnitude(freqAr, this.filters[i])));
-    console.log("Edges:    ", printArray(calcMagnitude(rangeAr, this.filters[i])));
-};
