@@ -189,24 +189,3 @@ function arrayToString(array) {
     var data = (array instanceof Uint8Array)? array: new Uint8Array(array);
     return String.fromCharCode.apply(null, data);
 }
-
-function bytesToString(bytes) {
-    var dataView = new DataView(bytes);
-    if ('TextDecoder' in window) {
-        var decoder = new TextDecoder("utf8");
-        var text = decoder.decode(dataView);
-        return text;
-    } else {
-        console.warn("Browser does not support encoding API. Tags can be decoded incorrect.");
-        return String.fromCharCode.apply(null, new Uint16Array(bytes));
-    }
-}
-
-function _arrayBufferToString(buf, callback) {
-    var bb = new Blob([new Uint8Array(buf)]);
-    var f = new FileReader();
-    f.onload = function(e) {
-        callback(e.target.result);
-    };
-    f.readAsText(bb);
-}

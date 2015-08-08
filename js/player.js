@@ -83,6 +83,10 @@ Player.prototype._initVisualization = function() {
     }.bind(this));
 };
 
+/**
+ * Открываем музыкальный файл
+ * @param {File} file
+ */
 Player.prototype.open = function(file) {
     var reader = new FileReader();
     reader.addEventListener("load", function() {
@@ -105,6 +109,9 @@ Player.prototype.open = function(file) {
     reader.readAsArrayBuffer(file);
 };
 
+/**
+ * Начать воспроизведение
+ */
 Player.prototype.play = function() {
     if (!this.playing && this.audioDataBuffer) {
         this.audioSource = this.audioCtx.createBufferSource();
@@ -129,6 +136,9 @@ Player.prototype.play = function() {
     }
 };
 
+/**
+ * Приостановить, с возможностью продолжения
+ */
 Player.prototype.pause = function() {
     this.pausedAfter = Date.now() - this.startedAt;
     if (this.audioDataBuffer) {
@@ -141,6 +151,9 @@ Player.prototype.pause = function() {
     this._updatePlayOrPause();
 };
 
+/**
+ * Остановить, воспроизведение начнет трек с начала
+ */
 Player.prototype.stop = function() {
     this.pausedAfter = 0;
     this.audioSource.stop();
@@ -203,6 +216,10 @@ Player.prototype._showTags = function(tags) {
     showTag(this.elements.tags.artist, tags.artist);
 };
 
+/**
+ * Показывает кнопку Play или Pause в зависимости от того, идёт воспроизведение или нет
+ * @private
+ */
 Player.prototype._updatePlayOrPause = function() {
     if (this.playing) {
         var toShow = this.elements.pause;
