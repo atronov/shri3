@@ -7,7 +7,7 @@ function addClass(className, el) {
     if (!el.className.match(classRegexp)) {
         el.className = el.className + " " + className;
     }
-};
+}
 
 function removeClass(className, el) {
     console.log("Remove");
