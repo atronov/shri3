@@ -9,7 +9,7 @@ function Spectrum(analyzerNode, canvas) {
 Spectrum.prototype = Object.create(Visualization.prototype);
 
 Spectrum.prototype._draw = function() {
-    var barCount = 30;
+    var barCount = 80;
     var width = this.canvas.width;
     var height = this.canvas.height;
     var ctx = this.canvasCtx;

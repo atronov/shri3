@@ -16,6 +16,10 @@ Equalizer = function(audioCtx, equalizerElement) {
  * Сделано в не в конструкторе, чтобы можно было менять источник/приемник в одном экхемпляре
  */
 Equalizer.prototype.connect = function(srcNode, dstNode) {
+    if (this.srcNode) {
+        this.srcNode.disconnect();
+    }
+    this.filters[this.filters.length-1].disconnect();
     this.srcNode = srcNode;
     this.dstNode = dstNode;
     this.connected = true;
