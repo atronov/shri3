@@ -152,6 +152,7 @@ Equalizer.prototype._updateState = function() {
  * @private
  */
 Equalizer.prototype._enable = function() {
+    this.srcNode.disconnect();
     this.srcNode.connect(this.filters[0]);
     this.filters.reduce(function(cur, next) {
         cur.connect(next);
