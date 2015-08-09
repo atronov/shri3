@@ -18,8 +18,33 @@ body {
     display: block;
 }
 
+.inline-block {
+    display: inline-block;
+    vertical-align: top;
+}
+
 .indented {
     margin: 3px;
+}
+
+.border-left {
+    border-left: solid thin #c5c5c5;
+}
+
+.centered {
+    text-align: center;
+}
+
+.border-left.indented {
+    padding-left: 3px;
+}
+
+.border-bottom {
+    border-bottom: solid thin #c5c5c5;
+}
+
+.border-top {
+    border-top: solid thin #c5c5c5;
 }
 
 .vertical-range {

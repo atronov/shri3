@@ -17,16 +17,20 @@
         z-index: 2;
     }
 
+    .player__visualization-select {
+        position: relative;
+    }
+
     .player__visualization-canvas {
         margin-top: 3px;
         width: 100%;
         height: 250px;
-        border-top: solid thin #c5c5c5;
-        border-bottom: solid thin #c5c5c5;
+        min-width: 400px;
     }
 
     .player__equalizer {
         position: relative;
+        width: 380px;
     }
 
     .player__file-input {
@@ -37,12 +41,17 @@
     .player__tags {
         font-size: 90%;
         padding-left: 3px;
-    }
-
-    .player__visualization-select {
-        position: relative;
+        min-width: 300px;
     }
 
     .player__file-name {
         font-weight: bolder;
+    }
+
+    .player__error {
+        font-weight: 500;
+        padding-left: 3px;
+        padding-right: 3px;
+        color: darkred;
+        border-color: darkred;
     }

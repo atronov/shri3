@@ -39,7 +39,8 @@ Player.prototype._initElements = function() {
             album: element.querySelector(".player__album-tag"),
             artist: element.querySelector(".player__artist-tag")
         },
-        equalizer: element.querySelector(".player__equalizer")
+        equalizer: element.querySelector(".player__equalizer"),
+        error: element.querySelector(".player__error")
     };
 
     this.elements.play.addEventListener("click", this.play.bind(this));
@@ -99,11 +100,16 @@ Player.prototype.open = function(file) {
                     this.stop();
                 }
                 this.audioDataBuffer = buffer;
+                this._showError(undefined);
                 this._allowPlay();
             }.bind(this),
             function(e) {
-                console.error("Error with decoding audio data" + e);
-            }
+                console.error("Error with decoding audio data", e);
+                this._showError("Impossible to decode this file.");
+                if (this.playing) {
+                    this.stop();
+                }
+            }.bind(this)
         );
     }.bind(this));
     reader.readAsArrayBuffer(file);
@@ -231,4 +237,18 @@ Player.prototype._updatePlayOrPause = function() {
     var invisibleClass = "invisible";
     addClass(invisibleClass, toHide);
     removeClass(invisibleClass, toShow);
-}
+};
+
+/**
+ *
+ * @param message
+ * @private
+ */
+Player.prototype._showError = function (message) {
+    if (message && message.trim().length > 0) {
+        this.elements.error.textContent = message;
+        removeClass("invisible", this.elements.error);
+    } else {
+        addClass("invisible", this.elements.error);
+    }
+};

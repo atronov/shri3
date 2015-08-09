@@ -18,51 +18,54 @@
 <body>
     <main class="player">
         <input type="file" class="player__file-input">
+        <div class="player__error block indented invisible border-bottom"></div>
         <span class="player__file-name block indented"></span>
-        <div class="block indented">
-            <button class="player__play-button round-button">
-                <img class="round-button__img" src="img/play.svg">
-            </button>
-            <button class="player__pause-button round-button">
-                <img class="round-button__img" src="img/pause.svg">
-            </button>
-            <button class="player__stop-button round-button">
-                <img class="round-button__img" src="img/stop.svg">
-            </button>
-            <button class="player__open-button round-button">
-                <img class="round-button__img" src="img/folder.svg">
-            </button>
-        </div>
-        <div class="player__tags block indented">
-            <div class="player__title-tag">Трек: <span class="tag-content"></span></div>
-            <div class="player__album-tag">Альбом: <span class="tag-content"></span></div>
-            <div class="player__artist-tag">Исполнитель: <span class="tag-content"></span></div>
+        <div class="block">
+            <div class="indented inline-block">
+                <button class="player__play-button round-button">
+                    <img class="round-button__img" src="img/play.svg">
+                </button>
+                <button class="player__pause-button round-button">
+                    <img class="round-button__img" src="img/pause.svg">
+                </button>
+                <button class="player__stop-button round-button">
+                    <img class="round-button__img" src="img/stop.svg">
+                </button>
+                <button class="player__open-button round-button">
+                    <img class="round-button__img" src="img/folder.svg">
+                </button>
+                <div class="player__tags block indented">
+                    <div class="player__title-tag">Трек: <span class="tag-content"></span></div>
+                    <div class="player__album-tag">Альбом: <span class="tag-content"></span></div>
+                    <div class="player__artist-tag">Исполнитель: <span class="tag-content"></span></div>
+                </div>
+            </div>
+            <div class="player__equalizer inline-block indented border-left">
+                <div class="block indented">
+                    <span>Equalizer</span>
+                    <input type="checkbox" class="equalizer__switch">
+                    <select class="equalizer__preset"></select>
+                </div>
+                <div class="block indented centered">
+                    <input type="range" class="vertical-range line1" orient="vertical">
+                    <input type="range" class="vertical-range line2" orient="vertical">
+                    <input type="range" class="vertical-range line3" orient="vertical">
+                    <input type="range" class="vertical-range line4" orient="vertical">
+                    <input type="range" class="vertical-range line5" orient="vertical">
+                    <input type="range" class="vertical-range line6" orient="vertical">
+                    <input type="range" class="vertical-range line7" orient="vertical">
+                    <input type="range" class="vertical-range line8" orient="vertical">
+                    <input type="range" class="vertical-range line9" orient="vertical">
+                    <input type="range" class="vertical-range line10" orient="vertical">
+                </div>
+            </div>
         </div>
         <div class="player__visualization block indented">
             <div>
                 <span>Visualization</span>
                 <select class="player__visualization-select"></select>
             </div>
-            <canvas class="player__visualization-canvas block" width="600" height="250"></canvas>
-        </div>
-        <div class="player__equalizer block indented">
-            <div class="block">
-                <span>Equalizer</span>
-                <input type="checkbox" class="equalizer__switch">
-                <select class="equalizer__preset"></select>
-            </div>
-            <div class="block">
-                <input type="range" class="vertical-range line1" orient="vertical">
-                <input type="range" class="vertical-range line2" orient="vertical">
-                <input type="range" class="vertical-range line3" orient="vertical">
-                <input type="range" class="vertical-range line4" orient="vertical">
-                <input type="range" class="vertical-range line5" orient="vertical">
-                <input type="range" class="vertical-range line6" orient="vertical">
-                <input type="range" class="vertical-range line7" orient="vertical">
-                <input type="range" class="vertical-range line8" orient="vertical">
-                <input type="range" class="vertical-range line9" orient="vertical">
-                <input type="range" class="vertical-range line10" orient="vertical">
-            </div>
+            <canvas class="player__visualization-canvas block border-top border-bottom" width="600" height="250"></canvas>
         </div>
         <div class="player__drop-area invisible">drop file here</div>
     </main>
