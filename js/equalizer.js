@@ -95,20 +95,17 @@ Equalizer.prototype._initPresets = function() {
         presetOption.textContent = presetKey;
         presetOption.value = presetKey;
         if (presetKey === defaultSelected) {
-            presetOption.setAttribute("selected", "selected");
+            presetOption.selected = true;
         }
         presetSelect.appendChild(presetOption);
     }
     presetSelect.addEventListener("change", function() {
-        var presetName = presetSelect.options[presetSelect.selectedIndex].value;
+        var presetName = presetSelect.value;
         this._setFilters(this.presets[presetName]);
     }.bind(this));
     // если пользователь изменил один из фильтров, выставляем комбобокс в custom
     var setCustomPreset = function() {
-        for (var ind in presetSelect.options) {
-            if (presetSelect.options[ind].value === "custom")
-                presetSelect.options[ind].setAttribute("selected", "selected");
-        }
+        presetSelect.options = "custom";
     };
     this.filterInputs.forEach(function(filterInput) {
         filterInput.addEventListener("change", setCustomPreset.bind(this));
@@ -116,6 +113,13 @@ Equalizer.prototype._initPresets = function() {
     this._setFilters(this.presets[defaultSelected]);
 };
 
+/**
+ * @param {string} type тип фильтра
+ * @param {number} f частота
+ * @param {number} q Q-фактор
+ * @return {BiquadFilterNode} фильтр
+ * @private
+ */
 Equalizer.prototype._createFilter = function(type, f, q) {
     var filter = this.audioCtx.createBiquadFilter();
     filter.type = type;
@@ -125,6 +129,11 @@ Equalizer.prototype._createFilter = function(type, f, q) {
     return filter;
 };
 
+/**
+ * Устанавливаем усиление для каждого из фильтров
+ * @param {Array<number>} gains
+ * @private
+ */
 Equalizer.prototype._setFilters = function(gains) {
     if (gains) {
         for (var i = 0; i < gains.length; i++) {
@@ -133,6 +142,12 @@ Equalizer.prototype._setFilters = function(gains) {
     }
 };
 
+/**
+ * Устанавливаем усиление фильтра
+ * @param {number} i номер фильтра
+ * @param {number} gain усиление
+ * @private
+ */
 Equalizer.prototype._setFilter = function(i, gain) {
     this.filterInputs[i].value = gain;
     this.filters[i].gain.value = gain;
@@ -152,7 +167,7 @@ Equalizer.prototype._updateState = function() {
 };
 
 /**
- * Подключает фильтры между испочником и приёмником
+ * Подключает фильтры между источником и приёмником
  * @private
  */
 Equalizer.prototype._enable = function() {

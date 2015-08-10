@@ -60,7 +60,8 @@ Player.prototype._initEqualizer = function() {
 Player.prototype._initVisualization = function() {
     var visualizations = {
         "spectrum": Spectrum,
-        "waveform": WaveForm
+        "waveform": WaveForm,
+        "none": undefined
     };
     var visualizationSelect = this.elements.visualization.select;
     var selected = false;
@@ -71,13 +72,15 @@ Player.prototype._initVisualization = function() {
         visualizationEl.value = visualizationName;
         if (!selected) {
             this.visualizationConstruntor = visualization;
-            visualizationEl.setAttribute("selected", "selected");
+            visualizationEl.selected = true;
         }
         visualizationSelect.appendChild(visualizationEl);
     }
     visualizationSelect.addEventListener("change", function() {
-        var visualizationName = visualizationSelect.options[visualizationSelect.selectedIndex].value;
-        this.visualizationConstruntor = visualizations[visualizationName];
+        var visualizationName = visualizationSelect.value;
+        var visualization = visualizations[visualizationName];
+        if (!visualization) return;
+        this.visualizationConstruntor = visualization;
         if (this.playing) {
             this._connectVisualization();
         }
@@ -176,7 +179,11 @@ Player.prototype._connectVisualization = function() {
     this.visualization = new Visualization(this.analyzer, this.elements.visualization.canvas);
 };
 
-
+/**
+ * Обработчик открытия файла
+ * @param e
+ * @private
+ */
 Player.prototype._handleFileOpen = function(e) {
     e.preventDefault();
     this._hideDropArea(e);
@@ -240,8 +247,8 @@ Player.prototype._updatePlayOrPause = function() {
 };
 
 /**
- *
- * @param message
+ * Показываем сообщение об ошибке
+ * @param {string} message; если пустое скрываем предыдущее
  * @private
  */
 Player.prototype._showError = function (message) {
