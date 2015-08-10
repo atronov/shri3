@@ -30,7 +30,6 @@
 
     .player__equalizer {
         position: relative;
-        width: 400px;
     }
 
     .player__file-input {
