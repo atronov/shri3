@@ -105,7 +105,7 @@ Equalizer.prototype._initPresets = function() {
     }.bind(this));
     // если пользователь изменил один из фильтров, выставляем комбобокс в custom
     var setCustomPreset = function() {
-        presetSelect.options = "custom";
+        presetSelect.value = "custom";
     };
     this.filterInputs.forEach(function(filterInput) {
         filterInput.addEventListener("change", setCustomPreset.bind(this));

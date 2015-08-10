@@ -176,7 +176,9 @@ Player.prototype._connectVisualization = function() {
         this.visualization.stop();
     }
     var Visualization =  this.visualizationConstruntor;
-    this.visualization = new Visualization(this.analyzer, this.elements.visualization.canvas);
+    if (Visualization) {
+        this.visualization = new Visualization(this.analyzer, this.elements.visualization.canvas);
+    }
 };
 
 /**
