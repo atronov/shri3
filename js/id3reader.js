@@ -4,8 +4,12 @@
 
 /**
  * Читает теги формата ID3v1
+ * ID3v1 - скудный формат для тегов, но его довольно просто парсить
+ * существует ID3v2, но его парсить довольно сложно
+ * для этих целей есть библиотека https://github.com/aadsm/JavaScript-ID3-Reader
+ * но использовать её не спортивно
  * @param {ArrayBuffer} recordData байты файла
- * @returns {{}} объект с тегами
+ * @returns {object} объект с тегами
  */
 function getTags(recordData) {
     var tags = {};
