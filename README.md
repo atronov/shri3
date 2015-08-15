@@ -3,3 +3,4 @@
 
 [Рабочая версия](http://player.atronov.ru/).
 
+Собираем `gulp build`
