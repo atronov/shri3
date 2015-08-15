@@ -35,9 +35,10 @@ gulp.task("html", function() {
 gulp.task("js", function() {
     gulp.src(path.join(src, "js/*.js"))
         .pipe(sourcemaps.init())
+        .pipe(concat("app.js"))
         .pipe(uglify())
         .pipe(sourcemaps.write("."))
-        .pipe(gulp.dest(path.join(dst, "js")));
+        .pipe(gulp.dest(dst));
 });
 
 gulp.task("img", function() {
