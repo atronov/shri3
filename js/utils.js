@@ -7,7 +7,6 @@
  * @param {HTMLElement} el элемент
  */
 function addClass(className, el) {
-    console.log("Addition");
     var classRegexp = new RegExp("\\b"+className+"\\b");
     if (!el.className.match(classRegexp)) {
         el.className = el.className + " " + className;
@@ -19,7 +18,6 @@ function addClass(className, el) {
  * @param {HTMLElement} el элемент
  */
 function removeClass(className, el) {
-    console.log("Remove");
     var classRegexp = new RegExp("\\b"+className+"\\b");
     if (el.className.match(classRegexp)) {
         el.className = el.className.replace(classRegexp, "");
